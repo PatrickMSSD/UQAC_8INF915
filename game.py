@@ -32,7 +32,7 @@ class Car:
         self.position += self.velocity.rotate(-self.angle) * dt
         self.angle += degrees(angular_velocity) * dt
         
-    def calculPointSensor(x, y, angle, dist):
+    def calculPointSensor(self, x, y, angle, dist):
         """x, y sont les coord de la voiture, angle est l'angle du capteur, dist 
         la distance jusqu'à laquelle peut voir le capteur
         fonction utilisee dans sensors"""
@@ -49,7 +49,7 @@ class Car:
         else:
             return(x + oppose, y + adjacent)
         
-    def intersec(segment, obs):
+    def intersec(self, segment, obs):
         """renvoie la distance entre le 1er point du segment, et le segment de obs le plus proche avec
         lequel segment a une intersection, ou -1 s'il n'a aucune intersection avec aucun segment d'obs
         fonction utilisee dans sensors"""
@@ -63,7 +63,7 @@ class Car:
            y3 = k[0][1]
            x4 = k[1][0]
            y4 = k[1][1]
-           print(x1, y1, x2, y2, x3, y3, x4, y4)
+           #print(x1, y1, x2, y2, x3, y3, x4, y4)
            
            det = (x2 - x1)*(y3 - y4 ) - (x3 - x4 )*(y2 - y1)
            if(det!=0):
@@ -94,21 +94,21 @@ class Car:
         """
         
         s1 = []
-        xsens,ysens = self.calculPointSensor(self.x, self.y, self.angle + 15, 10) 
-        # 10 = distance à laquelle voit le capteur ; 15 = angle du capteur par rapport au "front" de la voiture
-        s1.append( (self.x, self.y))
+        xsens, ysens = self.calculPointSensor(self.position[0], self.position[1], (self.angle + 15), 5)
+        # 5 = distance à laquelle voit le capteur ; 15 = angle du capteur par rapport au "front" de la voiture
+        s1.append( (self.position[0], self.position[1]))
         s1.append((xsens, ysens))
         # Donc s1 = [(x, y) , (xsens, ysens)] où (xsens, ysens) est le point final du segment capteur
         
         s2 = []
-        xsens,ysens = self.calculPointSensor(self.x, self.y, self.angle, 10) 
-        s2.append( (self.x, self.y))
+        xsens,ysens = self.calculPointSensor(self.position[0], self.position[1], self.angle, 5) 
+        s2.append( (self.position[0], self.position[1]))
         s2.append((xsens, ysens))
         
         s3 = []
-        xsens,ysens = self.calculPointSensor(self.x, self.y, self.angle - 15, 10) 
-        s2.append( (self.x, self.y))
-        s2.append((xsens, ysens))
+        xsens,ysens = self.calculPointSensor(self.position[0], self.position[1], self.angle - 15, 5) 
+        s3.append( (self.position[0], self.position[1]))
+        s3.append((xsens, ysens))
         
         return(self.intersec(s1, obs), self.intersec(s2, obs), self.intersec(s3, obs))
         
@@ -180,8 +180,10 @@ class Game:
             # Drawing
             self.screen.fill((0, 0, 0))
             rotated = pygame.transform.rotate(car_image, car.angle)
-            print (car.angle % 360)
-            print(car.angle)
+            #print (car.angle % 360)
+            #print(car.angle)
+            #print(car.position[0], car.position[1])
+#Test des Sensor >>> print(car.sensors([[(20,10),(19,9)],[(25,15),(20,15)]]))
             rect = rotated.get_rect()
             self.screen.blit(rotated, car.position * ppu - (rect.width / 2, rect.height / 2))
             pygame.display.flip()
