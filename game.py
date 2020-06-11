@@ -2,7 +2,7 @@ import os
 import pygame
 from math import cos, sin, radians, degrees, copysign, sqrt
 from pygame.math import Vector2
-
+from circuit import Circuit
 
 class Car:
     def __init__(self, x, y, angle=0.0, length=4, max_steering=30, max_acceleration=5.0):
@@ -120,10 +120,12 @@ class Game:
         pygame.display.set_caption("Car tutorial")
         width = 1280
         height = 720
+        
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
         self.ticks = 60
         self.exit = False
+        self.circuit = Circuit(self.screen)
 
     def run(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -131,6 +133,7 @@ class Game:
         car_image = pygame.image.load(image_path)
         car = Car(1, 1)
         ppu = 32
+        self.circuit.initCircuit()
 
         while not self.exit:
             dt = self.clock.get_time() / 1000
@@ -186,6 +189,9 @@ class Game:
 #Test des Sensor >>> print(car.sensors([[(20,10),(19,9)],[(25,15),(20,15)]]))
             rect = rotated.get_rect()
             self.screen.blit(rotated, car.position * ppu - (rect.width / 2, rect.height / 2))
+            self.circuit.draw()
+            
+            
             pygame.display.flip()
 
             self.clock.tick(self.ticks)
