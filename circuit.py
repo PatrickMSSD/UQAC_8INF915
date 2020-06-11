@@ -14,7 +14,7 @@ class Circuit :
 
     def __init__(self, screen):
         self.EcartementMur = 50
-        self.listObstacle = np.array([[(50,50),(50,100)],[(50,50),(140,50)],[(50,100),(140,100)]])
+        self.listObstacle = [[(50,50),(50,100)],[(50,50),(140,50)],[(50,100),(140,100)]]
         self.screen = screen
         self.end = (1200,700)
 
@@ -30,8 +30,8 @@ class Circuit :
         y2A = self.listObstacle[-1][1][1]
 
 
-        self.listObstacle = np.append(self.listObstacle,[[(x1A,y1A),(xNext,yNext)]],0)
-        self.listObstacle = np.append(self.listObstacle,[[(x2A,y2A),(x2A+xNext-x1A,y2A+yNext-y1A)]],0)
+        self.listObstacle.append([(x1A,y1A),(xNext,yNext)])
+        self.listObstacle.append([(x2A,y2A),(x2A+xNext-x1A,y2A+yNext-y1A)])
 
     def ConstructionTabCircuit(self):
         self.ConstructionSegmentCircuit(200,150)

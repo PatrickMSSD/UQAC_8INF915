@@ -186,7 +186,9 @@ class Game:
             #print (car.angle % 360)
             #print(car.angle)
             #print(car.position[0], car.position[1])
-#Test des Sensor >>> print(car.sensors([[(20,10),(19,9)],[(25,15),(20,15)]]))
+#Test des Sensor >>> 
+            print(self.circuit.listObstacle)
+            print(car.sensors(self.circuit.listObstacle))
             rect = rotated.get_rect()
             self.screen.blit(rotated, car.position * ppu - (rect.width / 2, rect.height / 2))
             self.circuit.draw()
