@@ -95,7 +95,7 @@ class Car:
         """
 
         s1 = []
-        xsens, ysens = self.calculPointSensor(self.position[0], self.position[1], (self.angle + 45), 100)
+        xsens, ysens = self.calculPointSensor(self.position[0], self.position[1], self.angle + 45, 100)
         # 5 = distance à laquelle voit le capteur ; 15 = angle du capteur par rapport au "front" de la voiture
         s1.append((self.position[0], self.position[1]))
         s1.append((xsens, ysens))
