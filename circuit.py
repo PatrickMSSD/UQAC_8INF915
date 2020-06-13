@@ -14,7 +14,7 @@ class Circuit :
 
     def __init__(self, screen):
         self.EcartementMur = 50
-        self.listObstacle = [[(50,50),(50,100)],[(50,50),(140,50)],[(50,100),(140,100)]]
+        self.listObstacle = [[(50,50),(50,150)],[(50,50),(200,50)],[(50,150),(200,150)]]
         self.screen = screen
         self.end = (1200,700)
 
@@ -34,21 +34,21 @@ class Circuit :
         self.listObstacle.append([(x2A,y2A),(x2A+xNext-x1A,y2A+yNext-y1A)])
 
     def ConstructionTabCircuit(self):
-        self.ConstructionSegmentCircuit(200,150)
-        self.ConstructionSegmentCircuit(300,350)
-        self.ConstructionSegmentCircuit(450,500)
-        self.ConstructionSegmentCircuit(750,500)
-        self.ConstructionSegmentCircuit(900,600)
-        self.ConstructionSegmentCircuit(1200,600)
+        self.ConstructionSegmentCircuit(300,100)
+        self.ConstructionSegmentCircuit(400,200)
+        self.ConstructionSegmentCircuit(500,300)
+        self.ConstructionSegmentCircuit(700,400)
+        self.ConstructionSegmentCircuit(900,500)
+        self.ConstructionSegmentCircuit(1200,550)
 
 
     def draw(self) : 
-        pygame.draw.line(self.screen, (0,0,255), (50,50),(50,100),5)
-        pygame.draw.line(self.screen, (0,0,255),(50,50),(140,50),5)
-        pygame.draw.line(self.screen, (0,0,255),(50,100),(140,100),5)
+        pygame.draw.line(self.screen, (0,0,255), (50,50),(50,150),5)
+        pygame.draw.line(self.screen, (0,0,255),(50,50),(200,50),5)
+        pygame.draw.line(self.screen, (0,0,255),(50,150),(200,150),5)
 
         for i  in range (3,len(self.listObstacle)) :
             pygame.draw.line(self.screen, (0,0,255), (self.listObstacle[i][0]),(self.listObstacle[i-2][1]),5)
             pygame.draw.line(self.screen, (0,0,255),(self.listObstacle[i][1]),(self.listObstacle[i-2][1]),5)
 
-        pygame.draw.line(self.screen, (0,0,255),(1200,600),(1200,650),5)
+        pygame.draw.line(self.screen, (0,0,255),(1200,550),(1200,650),5)
