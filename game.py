@@ -20,7 +20,7 @@ class Car:
         self.acceleration = 0.0
         self.steering = 0.0
 
-        self.fitness = x / 1150
+        self.fitness = 0
         self.EstEnCollision = False 
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -170,6 +170,10 @@ class Car:
                 print("Collision")
                 break
 
+    def CalculFitness(self): 
+        self.fitness = self.x / 1150
+
+
 
 class Game:
     def __init__(self):
@@ -189,6 +193,10 @@ class Game:
         # image_path = os.path.join(current_dir, "car.png")
         # car_image = pygame.image.load(image_path)
         car = Car(90, 75)
+        TabCar = []
+
+        for i in range(0,5): 
+            TabCar.append(Car(90,75))
         # ppu = 32
         self.circuit.initCircuit()
 
@@ -199,6 +207,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.exit = True
+
 
             # User input
             pressed = pygame.key.get_pressed()
