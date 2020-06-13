@@ -20,6 +20,9 @@ class Car:
         self.acceleration = 0.0
         self.steering = 0.0
 
+        self.fitness = x / 1150
+        self.EstEnCollision = False 
+
         current_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(current_dir, "car.png")
         self.image = pygame.image.load(image_path)
@@ -163,6 +166,7 @@ class Car:
         for segment in colliderSegments:
             isColliding = self.intersec(segment, obs)
             if (isColliding != -1):
+                self.EstEnCollision = True
                 print("Collision")
                 break
 
