@@ -21,7 +21,7 @@ class Car:
         self.steering = 0.0
 
         self.fitness = 0
-        self.EstEnCollision = False 
+        self.EstEnCollision = False
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(current_dir, "car.png")
@@ -121,6 +121,21 @@ class Car:
         return (self.intersec(s1, obs), self.intersec(s2, obs), self.intersec(s3, obs))
 
     def testCollision(self, obs):
+        """
+        obs est une liste de liste des points de début et de fin des obstacles :
+        [ [(12,8);(6,15)] ; [(4,3);(4,4)] ; ... ] où le premier obstacle
+        est un segment de x=12, y=8 à x=6, y=15 par exemple
+
+        Calcule les 4 segments représentant les côtés du collider de la voiture en utilisant la position
+        de la voiture, ses dimensions (celles de son image) ainsi que sa rotation,
+        puis vérifie si un de ces segments est en collision avec un des segments passées dans obs
+
+        Retourne True si la voiture est en collision avec un segment du tableau passé en paramètres,
+        False sinon
+
+        Utilise la fonction intermédiaire intersec codée plus haut
+        """
+
         collVertices = []
         collVertices.append(
             (self.position.x + (self.image.get_width() / 2), self.position.y + (-self.image.get_height() / 2)))
@@ -167,12 +182,15 @@ class Car:
             isColliding = self.intersec(segment, obs)
             if (isColliding != -1):
                 self.EstEnCollision = True
-                print("Collision")
+                # print("Collision")
+                return (True)
                 break
+            else:
+                self.EstEnCollision = False
+        return (False)
 
-    def CalculFitness(self): 
-        self.fitness = self.x / 1150
-
+    def CalculFitness(self):
+        self.fitness = self.position.x / 1150
 
 
 class Game:
@@ -195,8 +213,8 @@ class Game:
         car = Car(90, 75)
         TabCar = []
 
-        for i in range(0,5): 
-            TabCar.append(Car(90,75))
+        for i in range(0, 5):
+            TabCar.append(Car(90, 75))
         # ppu = 32
         self.circuit.initCircuit()
 
@@ -207,7 +225,6 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.exit = True
-
 
             # User input
             pressed = pygame.key.get_pressed()
