@@ -1,6 +1,6 @@
 import os
 import pygame
-from math import cos, sin, radians, degrees, copysign, sqrt
+from math import cos, sin, radians, degrees, copysign, sqrt, pi
 from pygame.math import Vector2
 from circuit import Circuit
 
@@ -20,6 +20,10 @@ class Car:
         self.acceleration = 0.0
         self.steering = 0.0
 
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(current_dir, "car.png")
+        self.image = pygame.image.load(image_path)
+
     def update(self, dt):
         self.velocity += (self.acceleration * dt, 0)
         self.velocity.x = max(-self.max_velocity, min(self.velocity.x, self.max_velocity))
@@ -33,7 +37,7 @@ class Car:
         self.position += self.velocity.rotate(-self.angle) * dt
         self.angle += degrees(angular_velocity) * dt
 
-    def calculPointSensor(self, x, y, angle, dist):
+    def calculPoint(self, x, y, angle, dist):
         """x, y sont les coord de la voiture, angle est l'angle du capteur, dist
         la distance jusqu'à laquelle peut voir le capteur
         fonction utilisee dans sensors"""
@@ -91,27 +95,76 @@ class Car:
         Ex : return (-1, 2.6, 5.3) signifie que le capteur 1 n'a rien capté, le capteur
         2 voit un mur à 2.6 de distance, et le capteur 3 voit un mur à 5.3 de distance
 
-        Utilise les fonctions intermédiaires calculPointSensor et intersec codées plus haut
+        Utilise les fonctions intermédiaires calculPoint et intersec codées plus haut
         """
 
         s1 = []
-        xsens, ysens = self.calculPointSensor(self.position[0], self.position[1], self.angle + 45, 100)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle + 45), 100)
         # 5 = distance à laquelle voit le capteur ; 15 = angle du capteur par rapport au "front" de la voiture
         s1.append((self.position[0], self.position[1]))
         s1.append((xsens, ysens))
         # Donc s1 = [(x, y) , (xsens, ysens)] où (xsens, ysens) est le point final du segment capteur
 
         s2 = []
-        xsens, ysens = self.calculPointSensor(self.position[0], self.position[1], self.angle, 100)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle, 100)
         s2.append((self.position[0], self.position[1]))
         s2.append((xsens, ysens))
 
         s3 = []
-        xsens, ysens = self.calculPointSensor(self.position[0], self.position[1], self.angle - 45, 100)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle - 45, 100)
         s3.append((self.position[0], self.position[1]))
         s3.append((xsens, ysens))
 
         return (self.intersec(s1, obs), self.intersec(s2, obs), self.intersec(s3, obs))
+
+    def testCollision(self, obs):
+        collVertices = []
+        collVertices.append(
+            (self.position.x + (self.image.get_width() / 2), self.position.y + (-self.image.get_height() / 2)))
+        collVertices.append(
+            (self.position.x + (self.image.get_width() / 2), self.position.y + (self.image.get_height() / 2)))
+        collVertices.append(
+            (self.position.x + (-self.image.get_width() / 2), self.position.y + (self.image.get_height() / 2)))
+        collVertices.append(
+            (self.position.x + (-self.image.get_width() / 2), self.position.y + (-self.image.get_height() / 2)))
+
+        radAngle = (self.angle % 360) * pi / 180
+
+        temp = []
+        for point in collVertices:
+            xPoint = point[0] - self.position.x
+            yPoint = point[1] - self.position.y
+            xRot = xPoint * cos(radAngle) + yPoint * sin(radAngle) + self.position.x
+            yRot = -xPoint * sin(radAngle) + yPoint * cos(radAngle) + self.position.y
+            temp.append((xRot, yRot))
+
+        collVertices = temp
+
+        seg1 = []
+        seg1.append((collVertices[0][0], collVertices[0][1]))
+        seg1.append((collVertices[1][0], collVertices[1][1]))
+        seg2 = []
+        seg2.append((collVertices[1][0], collVertices[1][1]))
+        seg2.append((collVertices[2][0], collVertices[2][1]))
+        seg3 = []
+        seg3.append((collVertices[2][0], collVertices[2][1]))
+        seg3.append((collVertices[3][0], collVertices[3][1]))
+        seg4 = []
+        seg4.append((collVertices[3][0], collVertices[3][1]))
+        seg4.append((collVertices[0][0], collVertices[0][1]))
+
+        colliderSegments = []
+        colliderSegments.append(seg1)
+        colliderSegments.append(seg2)
+        colliderSegments.append(seg3)
+        colliderSegments.append(seg4)
+
+        isColliding = 0
+        for segment in colliderSegments:
+            isColliding = self.intersec(segment, obs)
+            if (isColliding != -1):
+                print("Collision")
+                break
 
 
 class Game:
@@ -128,9 +181,9 @@ class Game:
         self.circuit = Circuit(self.screen)
 
     def run(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, "car.png")
-        car_image = pygame.image.load(image_path)
+        # current_dir = os.path.dirname(os.path.abspath(__file__))
+        # image_path = os.path.join(current_dir, "car.png")
+        # car_image = pygame.image.load(image_path)
         car = Car(90, 75)
         # ppu = 32
         self.circuit.initCircuit()
@@ -170,9 +223,9 @@ class Game:
             car.acceleration = max(-car.max_acceleration, min(car.acceleration, car.max_acceleration))
 
             if pressed[pygame.K_RIGHT]:
-                car.steering -= 500 * dt
+                car.steering -= 300 * dt
             elif pressed[pygame.K_LEFT]:
-                car.steering += 500 * dt
+                car.steering += 300 * dt
             else:
                 car.steering = 0
             car.steering = max(-car.max_steering, min(car.steering, car.max_steering))
@@ -182,13 +235,15 @@ class Game:
 
             # Drawing
             self.screen.fill((0, 0, 0))
-            rotated = pygame.transform.rotate(car_image, car.angle)
+            rotated = pygame.transform.rotate(car.image, car.angle)
             # print (car.angle % 360)
             # print(car.angle)
             # print(car.position[0], car.position[1])
             # Test des Sensor >>>
-            print(self.circuit.listObstacle)
-            print(car.sensors(self.circuit.listObstacle))
+            # print(self.circuit.listObstacle)
+            # print(car.sensors(self.circuit.listObstacle))
+            car.sensors(self.circuit.listObstacle)
+            car.testCollision(self.circuit.listObstacle)
             rect = rotated.get_rect()
             self.screen.blit(rotated, car.position - (rect.width / 2, rect.height / 2))
             self.circuit.draw()
