@@ -25,21 +25,21 @@ class Car:
         self.steering = 0.0
 
         self.fitness = 0
-        self.EstEnCollision = False
+        self.EstEnCollision = False  # La voiture est présentement en collision, peu importe avec quoi
+        self.canRun = True  # La voiture peut ou ne peut pas rouler (passé à false si collision avec un obstacle
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(current_dir, "car.png")
         self.image = pygame.image.load(image_path)
 
-    #Entrainement des NN utilisés par la voiture
-    def trainNn(self) : 
-        X = [[-1,-1,-1],[20,-1,6],[12,-1,20],[12,5,20],[30,10,20]]
-        yV = [1,0.5,0.5,0,-1]
-        yR = [0,1,-0.2,-0.3,0.4]
-        
+    # Entrainement des NN utilisés par la voiture
+    def trainNn(self):
+        X = [[-1, -1, -1], [20, -1, 6], [12, -1, 20], [12, 5, 20], [30, 10, 20]]
+        yV = [1, 0.5, 0.5, 0, -1]
+        yR = [0, 1, -0.2, -0.3, 0.4]
+
         self.nnV = MLPRegressor(random_state=1, max_iter=100).fit(X, yV)
         self.nnR = MLPRegressor(random_state=1, max_iter=100).fit(X, yR)
-
 
     def update(self, dt):
         self.velocity += (self.acceleration * dt, 0)
@@ -206,19 +206,20 @@ class Car:
     def CalculFitness(self):
         self.fitness = self.position.x / 1150
 
-
     # Fonction d'agent de la voiture
-    def run(self, obs, dt) :
+    def run(self, obs, dt):
         Entrée = self.sensors(obs)
         SortieVitesse = self.nnV.predict(np.asarray(Entrée).reshape(1, -1))
         SortieRotation = self.nnR.predict(np.asarray(Entrée).reshape(1, -1))
 
-
         self.acceleration += SortieVitesse[0] * 640 * dt
         self.steering += SortieRotation[0] * 300 * dt
 
-
-
+    def stop(self):
+        self.canRun = False
+        self.acceleration = 0.0
+        self.steering = 0.0
+        self.velocity = Vector2(0.0, 0.0)
 
 
 class Game:
@@ -227,7 +228,6 @@ class Game:
         pygame.display.set_caption("Car tutorial")
         width = 1280
         height = 720
-        
 
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
@@ -240,21 +240,18 @@ class Game:
         # image_path = os.path.join(current_dir, "car.png")
         # car_image = pygame.image.load(image_path)
 
-        #MODIFIER LE NOMBRE DE VOITURE ICI POUR EN AVOIR QU UNE
+        # MODIFIER LE NOMBRE DE VOITURE ICI POUR EN AVOIR QU UNE
         NombreVoiture = 5
         TabCar = []
 
-
         #  REMPLACER RANDOM PAR LES COORD DE LA VOITURE SI UNIQUE VOITURE, SINON LES 5 AURONT LE MEME COMPORTEMENT ET SERONT INDIFFERENCIABLE
         for i in range(0, NombreVoiture):
-            TabCar.append(Car(random.randint(0,100), random.randint(0,100)))
-  
-        for c in TabCar : 
+            TabCar.append(Car(random.randint(70, 110), random.randint(80, 120)))
+
+        for c in TabCar:
             c.trainNn()
 
-
         # ppu = 32
-
 
         self.circuit.initCircuit()
 
@@ -266,11 +263,12 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.exit = True
 
-
             # Mouvement de la voiture par IA
             for c in TabCar:
-                c.run(self.circuit.listObstacle, dt)
-
+                if (c.canRun):
+                    c.run(self.circuit.listObstacle, dt)
+                    if (c.testCollision(self.circuit.listObstacle)):
+                        c.stop()
 
             # Mouvement de la voiture par l'utilisateur
             """
@@ -309,11 +307,6 @@ class Game:
             car.steering = max(-car.max_steering, min(car.steering, car.max_steering))
             """
 
-
-
-
-
-
             # Logic
             for c in TabCar:
                 c.update(dt)
@@ -322,14 +315,14 @@ class Game:
             self.screen.fill((0, 0, 0))
             for c in TabCar:
                 rotated = pygame.transform.rotate(c.image, c.angle)
-            # print (car.angle % 360)
-            # print(car.angle)
-            # print(car.position[0], car.position[1])
-            # Test des Sensor >>>
-            # print(self.circuit.listObstacle)
-            # print(car.sensors(self.circuit.listObstacle))
-            #car.sensors(self.circuit.listObstacle)
-            #car.testCollision(self.circuit.listObstacle)
+                # print (car.angle % 360)
+                # print(car.angle)
+                # print(car.position[0], car.position[1])
+                # Test des Sensor >>>
+                # print(self.circuit.listObstacle)
+                # print(car.sensors(self.circuit.listObstacle))
+                # car.sensors(self.circuit.listObstacle)
+                # car.testCollision(self.circuit.listObstacle)
                 rect = rotated.get_rect()
                 self.screen.blit(rotated, c.position - (rect.width / 2, rect.height / 2))
 
