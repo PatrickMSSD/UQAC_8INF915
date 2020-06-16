@@ -20,7 +20,7 @@ class Circuit :
 
     def initCircuit(self):
         self.ConstructionTabCircuit()
-        print(self.listObstacle)
+        #print(self.listObstacle)
 
 
     def ConstructionSegmentCircuit(self, xNext, yNext):
