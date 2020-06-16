@@ -245,7 +245,7 @@ class Game:
             # print(car.position[0], car.position[1])
             # Test des Sensor >>>
             # print(self.circuit.listObstacle)
-            # print(car.sensors(self.circuit.listObstacle))
+            print(car.sensors(self.circuit.listObstacle))
             car.sensors(self.circuit.listObstacle)
             car.testCollision(self.circuit.listObstacle)
             rect = rotated.get_rect()
