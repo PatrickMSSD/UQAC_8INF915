@@ -7,6 +7,8 @@ from pygame.math import Vector2
 from circuit import Circuit
 from sklearn.neural_network import MLPRegressor
 from sklearn.datasets import make_regression
+from keras.layers import Dense
+from keras.models import Sequential
 
 
 class Car:
@@ -32,14 +34,6 @@ class Car:
         image_path = os.path.join(current_dir, "car.png")
         self.image = pygame.image.load(image_path)
 
-    # Entrainement des NN utilisés par la voiture
-    def trainNn(self):
-        X = [[-1, -1, -1], [20, -1, 6], [12, -1, 20], [12, 5, 20], [30, 10, 20]]
-        yV = [1, 0.5, 0.5, 0, -1]
-        yR = [0, 1, -0.2, -0.3, 0.4]
-
-        self.nnV = MLPRegressor(random_state=1, max_iter=100).fit(X, yV)
-        self.nnR = MLPRegressor(random_state=1, max_iter=100).fit(X, yR)
 
     def update(self, dt):
         self.velocity += (self.acceleration * dt, 0)
