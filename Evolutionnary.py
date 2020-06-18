@@ -1,4 +1,12 @@
 import random
+import NeuralNetwork as NN
+
+
+def initPopulation(nbIndividus):
+    population = []
+    for i in range(0, nbIndividus):
+        population.append(NN.NeuralNetwork())
+    return population
 
 
 def mutate(poids, maxmodif):
@@ -37,3 +45,70 @@ def breed(motherWeights, fatherWeights):
                 for j in range(0, jj):
                     childWeights[k][i][j] = random.choice([motherWeights[k][i][j], fatherWeights[k][i][j]])
     return childWeights
+
+
+def updateGeneration(population, parentsRatio, randOtherProb, mutationProb):
+    """Produit les NeuralNetworks d'une nouvelle population à partir d'une population donnée
+    parentsRatio est le pourcentage de parents (individus les plus performants de l'ancienne génération) qui seront repris tel-quels
+    randOtherProb est la probabilité qu'un individu moins performant soit repris tel-quel dans la nouvelle génération
+    mutationProb est la probabilité qu'un bébé issu de deux parents subisse une mutation"""
+
+    sortedNetworks = []
+
+    for network in population:
+        sortedNetworks.append(network)
+
+    sortedNetworks.sort(key=lambda network: network.getFitness(), reverse=True)
+    nbKeptParents = int(len(sortedNetworks) * parentsRatio)
+    parents = sortedNetworks[:nbKeptParents]
+
+    for individual in sortedNetworks[nbKeptParents:]:
+        if randOtherProb > random.random():
+            parents.append(individual)
+
+    nbParents = len(parents)
+
+    if (nbParents <= 1):
+        print("Erreur: Il foit y avoir plus d'un parent")
+        return -1
+
+    remainingNb = len(population) - nbParents
+    childrens = []
+
+    while (len(childrens) < remainingNb):
+        # emulation d'un do-while
+        mother = random.randint(0, nbParents - 1)
+        father = random.randint(0, nbParents - 1)
+        while (mother == father):
+            mother = random.randint(0, nbParents - 1)
+            father = random.randint(0, nbParents - 1)
+
+        mother = parents[mother]
+        father = parents[father]
+        baby = NN.NeuralNetwork()
+        baby.setPoidsNN(breed(mother.getPoidsNN(), father.getPoidsNN()))
+        if mutationProb > random.random():
+            baby.setPoidsNN(mutate(baby.getPoidsNN(), 0.2))  # Valeur en dur à changer
+        childrens.append(baby)
+
+    parents.extend(childrens)
+    return parents
+
+
+# -------
+# TESTS :
+
+"""
+# Génère les réseaux de neurones aléatoires pour une population donnée, change la fitness, 
+# puis met à jour la population (nouvelle génération)
+
+pop = initPopulation(5)
+print(pop)
+pop[0].setFitness(0)
+pop[1].setFitness(2)
+pop[2].setFitness(1)
+pop[3].setFitness(4)
+pop[4].setFitness(3)
+pop = updateGeneration(pop, 0.4, 0.1, 0.2)
+print(pop)
+"""

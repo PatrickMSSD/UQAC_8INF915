@@ -8,6 +8,13 @@ class NeuralNetwork():
 
     def __init__(self, nn_param_choices=None):
         self.m_model = self.newRadomNN()
+        self.m_fitness = 0
+
+    def getFitness(self):
+        return self.m_fitness
+
+    def setFitness(self, fitness):
+        self.m_fitness = fitness
 
     def newRadomNN(self):
         """Créé un nouveau NN aléatoire et le renvoie"""
