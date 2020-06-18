@@ -37,7 +37,7 @@ def predictNN(model, entry, maxrange):
     #print(y[0])
     return(y[0])
 
-def modifPoids(poids, maxmodif):
+def hybrid(poids, maxmodif):
     """Produit un nouveau tableau de poids en se basant sur le tableau de poids d'entrée et en le modifiant légèrement aléatoirement. 
     maxmodif est la valeur maximale de modification des poids. On peut donc, pour chaque poids, varier de -maxmodif à +maxmodif"""
     for k in poids:
@@ -78,7 +78,7 @@ model = newRadomNN()
 p = getPoidsNN(model)
 print(p)
 print("---------------")
-pmodif = modifPoids(p, 0.15)
+pmodif = hybrid(p, 0.15)
 print(pmodif)
 """
     

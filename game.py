@@ -5,7 +5,7 @@ import random
 from math import cos, sin, radians, degrees, copysign, sqrt, pi
 from pygame.math import Vector2
 from circuit import Circuit
-from neural import Neural
+import neural
 from sklearn.neural_network import MLPRegressor
 from sklearn.datasets import make_regression
 from keras.layers import Dense
