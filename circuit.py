@@ -13,14 +13,23 @@ from math import *
 class Circuit :
 
     def __init__(self, screen):
-        self.EcartementMur = 50
         self.listObstacle = [[(50,50),(50,150)],[(50,50),(200,50)],[(50,150),(200,150)]]
+        self.listCheckpoints = []
         self.screen = screen
         self.end = (1200,700)
 
     def initCircuit(self):
         self.ConstructionTabCircuit()
-        #print(self.listObstacle)
+        self.initCheckpoints()
+
+    def initCheckpoints(self): 
+        i = 0
+        for x in self.listObstacle[1:len(self.listCheckpoints)-1]:
+            if not (i%2):
+                self.listCheckpoints.append([x[1],(x[1][0],x[1][1]+100)])
+            i= i + 1
+
+        print(self.listCheckpoints)
 
 
     def ConstructionSegmentCircuit(self, xNext, yNext):
@@ -28,8 +37,6 @@ class Circuit :
         y1A = self.listObstacle[-2][1][1]
         x2A = self.listObstacle[-1][1][0]
         y2A = self.listObstacle[-1][1][1]
-
-
         self.listObstacle.append([(x1A,y1A),(xNext,yNext)])
         self.listObstacle.append([(x2A,y2A),(x2A+xNext-x1A,y2A+yNext-y1A)])
 
@@ -40,15 +47,12 @@ class Circuit :
         self.ConstructionSegmentCircuit(700,400)
         self.ConstructionSegmentCircuit(900,500)
         self.ConstructionSegmentCircuit(1200,550)
+        self.listObstacle.append([(1200,550),(1200,650)])
 
 
     def draw(self) : 
-        pygame.draw.line(self.screen, (0,0,255), (50,50),(50,150),5)
-        pygame.draw.line(self.screen, (0,0,255),(50,50),(200,50),5)
-        pygame.draw.line(self.screen, (0,0,255),(50,150),(200,150),5)
+        for i  in range (0,len(self.listObstacle)) :
+            pygame.draw.line(self.screen, (0,0,255), (self.listObstacle[i][0]),(self.listObstacle[i][1]),5)
+        for i  in range (0,len(self.listCheckpoints)) :
+            pygame.draw.line(self.screen, (255,0,0), (self.listCheckpoints[i][0]),(self.listCheckpoints[i][1]),5)
 
-        for i  in range (3,len(self.listObstacle)) :
-            pygame.draw.line(self.screen, (0,0,255), (self.listObstacle[i][0]),(self.listObstacle[i-2][1]),5)
-            pygame.draw.line(self.screen, (0,0,255),(self.listObstacle[i][1]),(self.listObstacle[i-2][1]),5)
-
-        pygame.draw.line(self.screen, (0,0,255),(1200,550),(1200,650),5)
