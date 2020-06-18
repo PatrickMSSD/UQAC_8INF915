@@ -48,34 +48,37 @@ class NeuralNetwork():
 
 """
 # Application du NN aleatoire, du Predict, du passage des Poids en argument du NN, de la reproduction
+import Evolutionnary as ev
 
-model1 = newRadomNN()
-poids1 = getPoidsNN(model1)
-print(predictNN(model1, (36, 12, -1), 45))
+model1 = NeuralNetwork()
+poids1 = model1.getPoidsNN()
+print(model1.predictNN((36, 12, -1), 45))
 
-model2 = newRadomNN()
-print(predictNN(model2, (36, 12, -1), 45))
+model2 = NeuralNetwork()
+print(model2.predictNN((36, 12, -1), 45))
 
-#print(getPoidsNN(model1))
-#print("_______________________________")
-#print(getPoidsNN(model2))
-#print("===============================")
-model3 = newRadomNN()
-setPoidsNN(model3, breed(getPoidsNN(model1), getPoidsNN(model2)))
-print(predictNN(model3, (36, 12, -1), 45))
-#print(getPoidsNN(model3))
+print(model1.getPoidsNN())
+print("_______________________________")
+print(model2.getPoidsNN())
+print("===============================")
+model3 = NeuralNetwork()
+model3.setPoidsNN(ev.breed(model1.getPoidsNN(), model2.getPoidsNN()))
+print(model3.predictNN((36, 12, -1), 45))
+print(model3.getPoidsNN())
 
-setPoidsNN(model2, poids1)
-# print(predictNN(model2, (36, 12, -1), 45))
+model2.setPoidsNN(poids1)
+print(model2.predictNN((36, 12, -1), 45))
 """
 
 """
 # Application de la modif des poids
+import Evolutionnary as ev
 
-model = newRadomNN()
-p = getPoidsNN(model)
+model = NeuralNetwork()
+p = model.getPoidsNN()
 print(p)
 print("---------------")
-pmodif = mutate(p, 0.15)
+pmodif = ev.mutate(p, 0.15)
 print(pmodif)
 """
+
