@@ -35,6 +35,14 @@ class Car:
         self.image = pygame.image.load(image_path)
 
 
+    # Entrainement des NN utilisés par la voiture
+    def trainNn(self):
+        X = [[-1, -1, -1], [20, -1, 6], [12, -1, 20], [12, 5, 20], [30, 10, 20]]
+        y = [[1,0], [0.5,1], [0.5,-0.2], [0,-0.3], [-1,0.4]]
+      
+
+        self.nn = MLPRegressor(random_state=1, max_iter=200).fit(X, y)
+
     def update(self, dt):
         self.velocity += (self.acceleration * dt, 0)
         self.velocity.x = max(-self.max_velocity, min(self.velocity.x, self.max_velocity))
@@ -203,11 +211,11 @@ class Car:
     # Fonction d'agent de la voiture
     def run(self, obs, dt):
         Entrée = self.sensors(obs)
-        SortieVitesse = self.nnV.predict(np.asarray(Entrée).reshape(1, -1))
-        SortieRotation = self.nnR.predict(np.asarray(Entrée).reshape(1, -1))
+        Sortie = self.nn.predict(np.asarray(Entrée).reshape(1, -1))
 
-        self.acceleration += SortieVitesse[0] * 640 * dt
-        self.steering += SortieRotation[0] * 300 * dt
+
+        self.acceleration += Sortie[0][0] * 640 * dt
+        self.steering += Sortie[0][1] * 300 * dt
 
     def stop(self):
         self.canRun = False
