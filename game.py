@@ -256,7 +256,7 @@ class Game:
 
         # ppu = 32
 
-        self.circuit.initCircuit()
+        #self.circuit.initCircuit()
 
         while not self.exit:
             dt = self.clock.get_time() / 1000
