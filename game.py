@@ -58,6 +58,10 @@ class Game:
                         c.run(self.circuit.listObstacle, dt)
                         if (c.testCollision(self.circuit.listObstacle)):
                             c.stop()
+                        elif (self.isOutOfBounds(c)): #si une voiture est sortie du circuit et de l'écran on la disqualifie
+                            c.stop()
+                            c.m_nn.setFitness(0)
+
 
                 # Mouvement de la voiture par l'utilisateur
                 """
@@ -131,6 +135,11 @@ class Game:
             TabCar.clear()
 
         pygame.quit()
+
+    def isOutOfBounds(self, aCar):
+        if aCar.position.x < 0 or aCar.position.x > self.screen.get_width() \
+                or aCar.position.y < 0 or aCar.position.y > self.screen.get_height():
+            return True
 
 
 if __name__ == '__main__':
