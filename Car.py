@@ -1,14 +1,9 @@
 import os
+from math import cos, sin, radians, degrees, sqrt, pi
 import pygame
-import numpy as np
-import random
-from math import cos, sin, radians, degrees, copysign, sqrt, pi
 from pygame.math import Vector2
-from circuit import Circuit
-from sklearn.neural_network import MLPRegressor
-from sklearn.datasets import make_regression
-from keras.layers import Dense
-from keras.models import Sequential
+import NeuralNetwork as NN
+
 
 class Car:
     def __init__(self, x, y, angle=0.0, length=30, max_steering=100, max_acceleration=160):
@@ -25,22 +20,50 @@ class Car:
         self.acceleration = 0.0
         self.steering = 0.0
 
-        self.fitness = 0
         self.EstEnCollision = False  # La voiture est présentement en collision, peu importe avec quoi
         self.canRun = True  # La voiture peut ou ne peut pas rouler (passé à false si collision avec un obstacle
+        self.porteeCapteurs = 300
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(current_dir, "car.png")
         self.image = pygame.image.load(image_path)
 
+        self.m_nn = NN.NeuralNetwork()
 
-    # Entrainement des NN utilisés par la voiture
+    def getNeuralNetwork(self):
+        return self.m_nn
+
+    def setNeuralNetwork(self, nn):
+        self.m_nn = nn
+
+    def getFitness(self):
+        fitness = self.position.x
+        return fitness
+
+    # Fonction d'agent de la voiture
+    def run(self, obs, dt):
+        Entree = self.sensors(obs)
+        # Sortie = self.m_nn.predictNN(np.asarray(Entree).reshape(1, -1), self.porteeCapteurs)
+        Sortie = self.m_nn.predictNN(Entree, self.porteeCapteurs)
+        # print(Sortie[1])
+        self.acceleration += Sortie[0] * dt * 30
+
+        # self.steering += Sortie[1] * dt * 100
+        self.steering = (Sortie[1] * 2 - 1) * 100
+
+    def stop(self):
+        self.canRun = False
+        self.acceleration = 0.0
+        self.steering = 0.0
+        self.velocity = Vector2(0.0, 0.0)
+        self.m_nn.setFitness(self.getFitness())
+
+    '''# Entrainement des NN utilisés par la voiture
     def trainNn(self):
         X = [[-1, -1, -1], [20, -1, 6], [12, -1, 20], [12, 5, 20], [30, 10, 20]]
-        y = [[1 ,0], [0.5 ,1], [0.5 ,-0.2], [0 ,-0.3], [-1 ,0.4]]
+        y = [[1, 0], [0.5, 1], [0.5, -0.2], [0, -0.3], [-1, 0.4]]
 
-
-        self.nn = MLPRegressor(random_state=1, max_iter=200).fit(X, y)
+        self.nn = MLPRegressor(random_state=1, max_iter=200).fit(X, y)'''
 
     def update(self, dt):
         self.velocity += (self.acceleration * dt, 0)
@@ -117,19 +140,19 @@ class Car:
         """
 
         s1 = []
-        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle + 45), 100)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle + 45), self.porteeCapteurs)
         # 5 = distance à laquelle voit le capteur ; 15 = angle du capteur par rapport au "front" de la voiture
         s1.append((self.position[0], self.position[1]))
         s1.append((xsens, ysens))
         # Donc s1 = [(x, y) , (xsens, ysens)] où (xsens, ysens) est le point final du segment capteur
 
         s2 = []
-        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle, 100)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle, self.porteeCapteurs)
         s2.append((self.position[0], self.position[1]))
         s2.append((xsens, ysens))
 
         s3 = []
-        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle - 45, 100)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle - 45, self.porteeCapteurs)
         s3.append((self.position[0], self.position[1]))
         s3.append((xsens, ysens))
 
@@ -203,21 +226,3 @@ class Car:
             else:
                 self.EstEnCollision = False
         return (False)
-
-    def CalculFitness(self):
-        self.fitness = self.position.x / 1150
-
-    # Fonction d'agent de la voiture
-    def run(self, obs, dt):
-        Entrée = self.sensors(obs)
-        Sortie = self.nn.predict(np.asarray(Entrée).reshape(1, -1))
-
-
-        self.acceleration += Sortie[0][0] * 640 * dt
-        self.steering += Sortie[0][1] * 300 * dt
-
-    def stop(self):
-        self.canRun = False
-        self.acceleration = 0.0
-        self.steering = 0.0
-        self.velocity = Vector2(0.0, 0.0)
