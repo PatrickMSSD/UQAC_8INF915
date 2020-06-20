@@ -17,10 +17,13 @@ class Game:
         self.exit = False
         self.circuit = Circuit(self.screen)
 
+
     def run(self):
         # current_dir = os.path.dirname(os.path.abspath(__file__))
         # image_path = os.path.join(current_dir, "car.png")
         # car_image = pygame.image.load(image_path)
+
+        Evo.setLearningPhase(1)
 
         # MODIFIER LE NOMBRE DE VOITURE ICI POUR EN AVOIR QU UNE
         NombreVoiture = 10
@@ -37,13 +40,14 @@ class Game:
             #  REMPLACER RANDOM PAR LES COORD DE LA VOITURE SI UNIQUE VOITURE, SINON LES 5 AURONT LE MEME COMPORTEMENT ET SERONT INDIFFERENCIABLE
             for i in range(0, NombreVoiture):
                 # TabCar.append(Car.Car(random.randint(70, 110), random.randint(80, 120)))
-                TabCar.append(Car.Car(73, 350))
+                TabCar.append(Car.Car(100, 100, -90))
 
             for j in range(0, NombreVoiture):
                 TabCar[j].setNeuralNetwork(populationNN[j])
 
             self.clock = pygame.time.Clock()
 
+            Evo.setLearningPhase(0)
             while (allCarsCrashed == False):
                 dt = self.clock.get_time() / 1000
 
@@ -57,10 +61,9 @@ class Game:
                     if (c.canRun):
                         c.run(self.circuit.listObstacle, dt)
                         if (c.testCollision(self.circuit.listObstacle)):
-                            c.stop()
-                        elif (self.isOutOfBounds(c)): #si une voiture est sortie du circuit et de l'écran on la disqualifie
-                            c.stop()
-                            c.m_nn.setFitness(0)
+                            c.stop(False)
+                        elif (self.isOutOfBounds(c)): #si une voiture est sortie du circuit et de l'écran on la discalifie
+                            c.stop(True)
 
 
                 # Mouvement de la voiture par l'utilisateur
@@ -127,10 +130,12 @@ class Game:
 
                 self.clock.tick(self.ticks)
 
+            Evo.setLearningPhase(1)
+
             for x in range(0, NombreVoiture):
                 populationNN[x].setFitness(TabCar[x].getFitness())
 
-            populationNN = Evo.updateGeneration(populationNN, 0.4, 0.1, 0.2)
+            populationNN = Evo.updateGeneration(populationNN, 0.4, 0.1, 0.4, 0.2)
 
             TabCar.clear()
 

@@ -35,6 +35,7 @@ class NeuralNetwork():
 
     def predictNN(self, entry, maxrange):
         """Entry est la sortie du capteur (ex : (-1, 42, 12)) et maxrange est la portée du capteur"""
+
         x = np.ones((1, 3))
         for k in range(0, 2):
             if (entry[k] == -1):

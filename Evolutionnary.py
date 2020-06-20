@@ -9,6 +9,7 @@ def initPopulation(nbIndividus):
     return population
 
 
+'''
 def mutate(poids, maxmodif):
     """Produit un nouveau tableau de poids en se basant sur le tableau de poids d'entrée et en le modifiant légèrement aléatoirement.
     maxmodif est la valeur maximale de modification des poids. On peut donc, pour chaque poids, varier de -maxmodif à +maxmodif"""
@@ -24,6 +25,33 @@ def mutate(poids, maxmodif):
                         k[i][j] = 1
                     elif (k[i][j] < -1):
                         k[i][j] = -1
+    return poids
+'''
+
+
+def mutate(poids, maxmodif):
+    k = random.randint(0, poids.size - 1)
+
+    print("Mutation of ", k)
+
+    if (poids[k].ndim > 1):
+        i = random.randint(0, poids[k].shape[0] - 1)
+        j = random.randint(0, poids[k].shape[1] - 1)
+        rd = random.uniform(-maxmodif, maxmodif)
+        poids[k][i][j] += rd
+        if (poids[k][i][j] > 1):
+            poids[k][i][j] = 1
+        elif (poids[k][i][j] < -1):
+            poids[k][i][j] = -1
+
+    elif(poids[k].ndim == 1):
+        i = random.randint(0, poids[k].shape[0] - 1)
+        rd = random.uniform(-maxmodif, maxmodif)
+        poids[k][i] += rd
+        if (poids[k][i] > 1):
+            poids[k][i] = 1
+        elif (poids[k][i] < -1):
+            poids[k][i] = -1
     return poids
 
 
@@ -47,7 +75,7 @@ def breed(motherWeights, fatherWeights):
     return childWeights
 
 
-def updateGeneration(population, parentsRatio, randOtherProb, mutationProb):
+def updateGeneration(population, parentsRatio, randOtherProb, mutationProb, mutMaxModif):
     """Produit les NeuralNetworks d'une nouvelle population à partir d'une population donnée
     parentsRatio est le pourcentage de parents (individus les plus performants de l'ancienne génération) qui seront repris tel-quels
     randOtherProb est la probabilité qu'un individu moins performant soit repris tel-quel dans la nouvelle génération
@@ -88,12 +116,14 @@ def updateGeneration(population, parentsRatio, randOtherProb, mutationProb):
         baby = NN.NeuralNetwork()
         baby.setPoidsNN(breed(mother.getPoidsNN(), father.getPoidsNN()))
         if mutationProb > random.random():
-            baby.setPoidsNN(mutate(baby.getPoidsNN(), 0.2))  # Valeur en dur à changer
+            baby.setPoidsNN(mutate(baby.getPoidsNN(), mutMaxModif))
         childrens.append(baby)
 
     parents.extend(childrens)
     return parents
 
+def setLearningPhase(phase):
+    NN.tf.keras.backend.set_learning_phase(phase)
 
 # -------
 # TESTS :
