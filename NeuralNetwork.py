@@ -7,8 +7,9 @@ import tensorflow as tf
 class NeuralNetwork():
 
     def __init__(self, nn_param_choices=None):
-        self.m_model = self.newRadomNN()
         self.m_fitness = 0
+        self.entries = 3
+        self.m_model = self.newRadomNN()
 
     def getFitness(self):
         return self.m_fitness
@@ -19,7 +20,7 @@ class NeuralNetwork():
     def newRadomNN(self):
         """Créé un nouveau NN aléatoire et le renvoie"""
         model = Sequential()
-        model.add(layers.Dense(4, activation='relu', input_dim=3))
+        model.add(layers.Dense(4, activation='relu', input_dim=self.entries))
         model.add(layers.Dense(3, activation='relu'))
         model.add(layers.Dense(2, activation='sigmoid'))
         model.compile(optimizer='adam', loss='categorical_crossentropy')
@@ -36,12 +37,13 @@ class NeuralNetwork():
     def predictNN(self, entry, maxrange):
         """Entry est la sortie du capteur (ex : (-1, 42, 12)) et maxrange est la portée du capteur"""
 
-        x = np.ones((1, 3))
-        for k in range(0, 2):
+        x = np.ones((1, self.entries))
+        for k in range(0, self.entries):
             if (entry[k] == -1):
                 x[0][k] = 1
             else:
                 x[0][k] = entry[k] / maxrange
+        # print(entry)
         # print("X : ")
         # print(x[0])
         # print("----------------------------------")

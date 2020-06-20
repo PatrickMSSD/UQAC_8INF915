@@ -51,12 +51,15 @@ class Car:
         # self.steering += Sortie[1] * dt * 100
         self.steering = (Sortie[1] * 2 - 1) * 100
 
-    def stop(self):
+    def stop(self, disqualify: bool):
         self.canRun = False
         self.acceleration = 0.0
         self.steering = 0.0
         self.velocity = Vector2(0.0, 0.0)
-        self.m_nn.setFitness(self.getFitness())
+        if (not disqualify):
+            self.m_nn.setFitness(self.getFitness())
+        else:
+            self.m_nn.setFitness(0)
 
     '''# Entrainement des NN utilisés par la voiture
     def trainNn(self):
@@ -140,23 +143,34 @@ class Car:
         """
 
         s1 = []
-        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle + 45), self.porteeCapteurs)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle, self.porteeCapteurs)
         # 5 = distance à laquelle voit le capteur ; 15 = angle du capteur par rapport au "front" de la voiture
         s1.append((self.position[0], self.position[1]))
         s1.append((xsens, ysens))
         # Donc s1 = [(x, y) , (xsens, ysens)] où (xsens, ysens) est le point final du segment capteur
 
         s2 = []
-        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle, self.porteeCapteurs)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle + 45), self.porteeCapteurs)
         s2.append((self.position[0], self.position[1]))
         s2.append((xsens, ysens))
 
         s3 = []
-        xsens, ysens = self.calculPoint(self.position[0], self.position[1], self.angle - 45, self.porteeCapteurs)
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle - 45), self.porteeCapteurs)
         s3.append((self.position[0], self.position[1]))
         s3.append((xsens, ysens))
 
+        """s4 = []
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle + 90), self.porteeCapteurs)
+        s4.append((self.position[0], self.position[1]))
+        s4.append((xsens, ysens))
+
+        s5 = []
+        xsens, ysens = self.calculPoint(self.position[0], self.position[1], (self.angle - 90), self.porteeCapteurs)
+        s5.append((self.position[0], self.position[1]))
+        s5.append((xsens, ysens))"""
+
         return (self.intersec(s1, obs), self.intersec(s2, obs), self.intersec(s3, obs))
+                #self.intersec(s4, obs), self.intersec(s5, obs))
 
     def testCollision(self, obs):
         """
