@@ -32,7 +32,7 @@ def mutate(poids, maxmodif):
 def mutate(poids, maxmodif):
     k = random.randint(0, poids.size - 1)
 
-    print("Mutation of ", k)
+    #print("Mutation of ", k)
 
     if (poids[k].ndim > 1):
         i = random.randint(0, poids[k].shape[0] - 1)
