@@ -13,7 +13,7 @@ class Game:
 
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
-        self.ticks = 15
+        self.ticks = 60
         self.exit = False
         self.circuit = Circuit(self.screen)
 
@@ -26,7 +26,7 @@ class Game:
         Evo.setLearningPhase(1)
 
         # MODIFIER LE NOMBRE DE VOITURE ICI POUR EN AVOIR QU UNE
-        NombreVoiture = 10
+        NombreVoiture = 20
         TabCar = []
 
         populationNN = Evo.initPopulation(NombreVoiture)

@@ -79,7 +79,8 @@ def updateGeneration(population, parentsRatio, randOtherProb, mutationProb, mutM
     """Produit les NeuralNetworks d'une nouvelle population à partir d'une population donnée
     parentsRatio est le pourcentage de parents (individus les plus performants de l'ancienne génération) qui seront repris tel-quels
     randOtherProb est la probabilité qu'un individu moins performant soit repris tel-quel dans la nouvelle génération
-    mutationProb est la probabilité qu'un bébé issu de deux parents subisse une mutation"""
+    mutationProb est la probabilité qu'un bébé issu de deux parents subisse une mutation
+    mutMaxModif est la valeur maximale de la mutation"""
 
     sortedNetworks = []
 
